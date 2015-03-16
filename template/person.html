@@ -1,34 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="person_app">
 <head lang="en">
     <meta charset="UTF-8">
     <title></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
 </head>
-<body>
+<body ng-app="popitPerson">
 
     <!-- TODO: use a proper element to align form
          TODO: add proper id
-         TODO: fix incompatible field
+		 TODO: this should create user first but do not create memberships
+		 TODO: memberships to be added on edit. 
+		 TODO: all the variable should be a it is a ng-model user.something
          -->
-    <form>
-        <!-- TODO: Add photo here, how do we upload anyway -->
-        <label for="name">Name</label><input type="text" name="name" id="name"/>
-        <!-- TODO: This is a list -->
-        <label for="alternate_name">Alternate</label><input type="text" name="alternative_name" id="alternate_name"/>
-        <label for="email">Email</label><input type="text" name="email" id="email"/>
-        <!-- TODO: Malaysia is still conservative, limit to male and female for now -->
-        <label for="gender">Gender</label><input type="text" name="gender" id="gender"/>
-        <label for="birth_date">BirthDate</label><input type="text" name="birth_date" id="birth_date"/>
-        <label for="one_line_biography">Biography</label><input type="text" name="one_line_biography" id="one_line_biography"/>
-        <label for="biography">Biography</label><textarea name="biography" id="biography"></textarea>
-        <label for="national_identity">National Identity</label><input type="text" name="national_identity" id="national_identity"/>
-        <!-- TODO: This is a list TOO -->
-        <label for="links">Links</label><input type="text" name="links" id="links"/>
-        <!--
-        TODO: This is a list
-        TODO: Also create a form here to create new post if necessary
-        -->
-        <label for="memberships">Members of</label><input type="text" name="membership" id="memberships"/>
-    </form>
+	<div ng-controller="popitPersonController">
+		<form>
+			<!-- TODO: Add photo here, how do we upload anyway -->
+			<label for="name">Name</label><input type="text" name="name" id="name" ng-model="user.name"/>
+			<!-- TODO: This is a list -->
+			<label for="alternate_name">Alternate</label><input type="text" name="alternative_name" id="alternate_name" ng-model="user.alternate_name"/>
+			<label for="email">Email</label><input type="text" name="email" id="email" ng-model="user.email"/>
+			<!-- TODO: Malaysia is still conservative, limit to male and female for now 
+			     TODO: Use radio 
+			-->
+			<label for="gender">Gender</label><input type="text" name="gender" id="gender" ng-model="user.gender"/>
+			<label for="birth_date">BirthDate</label><input type="text" name="birth_date" id="birth_date" ng-model="user.birth_date"/>
+			<label for="one_line_biography">Biography</label><input type="text" name="one_line_biography" id="one_line_biography" ng-model="user.one_line_biography"/>
+			<label for="biography">Biography</label><textarea name="biography" id="biography" ng-model="user.biography"></textarea>
+			<label for="national_identity">National Identity</label><input type="text" name="national_identity" id="national_identity" ng-model="user.national_identity"/>
+			<!-- TODO: This is a list TOO -->
+			<label for="links">Links</label><input type="text" name="links" id="links" ng-model="user.links"/>
+			<!-- Memberships are not created now. First ensure user exist?-->
+		</form>
+	</div>
 </body>
+<script>
+angular.module('popitPerson', [])
+    .controller("popitPersonController", ['$scope', function($scope){
+	    $scope.master = angular.copy(user)
+	}])
+	
+</script>
 </html>
