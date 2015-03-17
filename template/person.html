@@ -1,44 +1,200 @@
 <!DOCTYPE html>
-<html ng-app="person_app">
+<html>
 <head lang="en">
     <meta charset="UTF-8">
     <title></title>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="angular.min.js"></script>
+    <script>
+    var popitPersonApp = angular.module('popitPerson', []);
+    popitPersonApp.controller('popitPersonController', function($scope){
+        $scope.person = {
+              "id": "john-q-public",
+              "name": "Mr. John Q. Public, Esq.",
+              "other_names": [
+                {
+                  "name": "Mr. Ziggy Q. Public, Esq.",
+                  "start_date": "1920-01",
+                  "end_date": "1949-12-31",
+                  "note": "Birth name"
+                },
+                {
+                  "name": "Dragonsbane",
+                  "note": "LARP character name"
+                }
+              ],
+              "identifiers": [
+                {
+                  "identifier": "046454286",
+                  "scheme": "SIN"
+                }
+              ],
+              "email": "jqpublic@xyz.example.com",
+              "gender": "male",
+              "birth_date": "1920-01",
+              "death_date": "2010-01-01",
+              "image": "http://example.com/pub/photos/jqpublic.gif",
+              "summary": "A hypothetical member of society deemed a 'common man'",
+              "biography": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ...",
+              "national_identity": "Scottish",
+              "contact_details": [
+                {
+                  "type": "cell",
+                  "label": "Mobile number",
+                  "value": "+1-555-555-0100",
+                  "note": "Free evenings and weekends"
+                }
+              ],
+              "links": [
+                {
+                  "url": "http://en.wikipedia.org/wiki/John_Q._Public",
+                  "note": "Wikipedia page"
+                }
+              ]
+            };
+        // TODO: this is fucking ugly
+        $scope.temp_alternative_name = {
+            name: '',
+            start_date: '',
+            end_date: '',
+            note: ''
+        };
+        // TODO: this is fucking ugly
+        $scope.temp_link = {
+            url: '',
+            note: ''
+        };
+
+        $scope.add_alternative_name = function(){
+            console.log("bam")
+
+            $scope.person.other_names.push($scope.temp_alternative_name);
+            $scope.temp_alternative_name = {
+                name: '',
+                start_date: '',
+                end_date: '',
+                note: ''
+            }
+        };
+
+        $scope.add_url = function(){
+            $scope.person.links.push($scope.temp_link);
+            $scope.temp_link = {
+                url: '',
+                note: ''
+            };
+        }
+    });
+
+</script>
 </head>
 <body ng-app="popitPerson">
 
     <!-- TODO: use a proper element to align form
-         TODO: add proper id
 		 TODO: this should create user first but do not create memberships
-		 TODO: memberships to be added on edit. 
-		 TODO: all the variable should be a it is a ng-model user.something
+		 TODO: memberships to be added on edit.
          -->
-	<div ng-controller="popitPersonController">
+	<div ng-controller="popitPersonController" class="container">
 		<form>
 			<!-- TODO: Add photo here, how do we upload anyway -->
-			<label for="name">Name</label><input type="text" name="name" id="name" ng-model="user.name"/>
-			<!-- TODO: This is a list -->
-			<label for="alternate_name">Alternate</label><input type="text" name="alternative_name" id="alternate_name" ng-model="user.alternate_name"/>
-			<label for="email">Email</label><input type="text" name="email" id="email" ng-model="user.email"/>
-			<!-- TODO: Malaysia is still conservative, limit to male and female for now 
-			     TODO: Use radio 
-			-->
-			<label for="gender">Gender</label><input type="text" name="gender" id="gender" ng-model="user.gender"/>
-			<label for="birth_date">BirthDate</label><input type="text" name="birth_date" id="birth_date" ng-model="user.birth_date"/>
-			<label for="one_line_biography">Biography</label><input type="text" name="one_line_biography" id="one_line_biography" ng-model="user.one_line_biography"/>
-			<label for="biography">Biography</label><textarea name="biography" id="biography" ng-model="user.biography"></textarea>
-			<label for="national_identity">National Identity</label><input type="text" name="national_identity" id="national_identity" ng-model="user.national_identity"/>
-			<!-- TODO: This is a list TOO -->
-			<label for="links">Links</label><input type="text" name="links" id="links" ng-model="user.links"/>
-			<!-- Memberships are not created now. First ensure user exist?-->
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input class="form-control" type="text" name="name" id="name" ng-model="person.name">
+            </div>
+            <div class="form-inline">
+                <div class="form-group">
+                    <label for="other_names">Other Name</label>
+                    <input class="form-control" type="text" id="other_names" ng-model="temp_alternative_name.name">
+                </div>
+                <div class="form-group">
+                    <label for="other_start_date">Start Date</label>
+                    <input class="form-control" type="text" id="other_start_date" ng-model="temp_alternative_name.start_date">
+                </div>
+                <div class="form-group">
+                    <label for="other_end_date">End Date</label>
+                    <input class="form-control" type="text" id="other_end_date" ng-model="temp_alternative_name.end_date">
+                </div>
+                <div class="form-group">
+                    <label for="other_note">Note</label>
+                    <input class="form-control" type="text" id="other_note" ng-model="temp_alternative_name.note">
+                </div>
+                <div class="form-group">
+                    <button class="form-control" id="submit_alternative_name" ng-click="add_alternative_name()">Add</button>
+                </div>
+            </div>
+            <table class="table">
+                <tr>
+                    <th>Name</th>
+                    <th>Start Date</th>
+                    <th>End Data</th>
+                    <th>Note</th>
+                </tr>
+                <tr ng-repeat="alternative_name in person.other_names">
+                    <td>{{alternative_name.name}}</td>
+                    <td>{{alternative_name.start_date}}</td>
+                    <td>{{alternative_name.end_date}}</td>
+                    <td>{{alternative_name.note}}</td>
+                </tr>
+            </table>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input class="form-control" type="text" name="email" id="email" ng-model="person.email"/>
+            </div>
+            <div class="form-group">
+                <label for="male" class="radio-inline">
+                    <input type="radio" name="gender" id="male" value="male" ng-model="person.gender"> Male
+                </label>
+                <label for="male" class="radio-inline">
+                    <input type="radio" name="gender" id="female" value="female" ng-model="person.gender"> Female
+                </label>
+            </div>
+            <div class="form-group">
+                <label for="birth_date">BirthDate</label>
+                <input class="form-control" type="text" name="birth_date" id="birth_date" ng-model="person.birth_date"/>
+            </div>
+            <div class="form-group">
+                <label for="one_line_biography">Biography</label>
+                <input class="form-control" type="text" name="one_line_biography" id="one_line_biography" ng-model="person.one_line_biography"/>
+            </div>
+            <div class="form-group">
+                <label for="biography">Biography</label>
+                <textarea class="form-control" row=3 name="biography" id="biography" ng-model="person.biography"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="national_identity">National Identity</label>
+                <input class="form-control" type="text" name="national_identity" id="national_identity" ng-model="person.national_identity"/>
+            </div>
+            <div class="form-inline">
+                <div class="form-group">
+                    <label for="link_url">URL</label>
+                    <input type="text" class="form-control" id="link_url" ng-model="temp_link.url">
+                </div>
+                <div class="form-group">
+                    <label for="link_note">Note</label>
+                    <input type="text" class="form-control" id="link_note" ng-model="templ_link.note">
+                </div>
+                <div class="form-group">
+                    <button id="submit_links" class="form-control" ng-click="add_url()">Add</button>
+                </div>
+            </div>
+
+            <table class="table">
+                <tr>
+                    <th>URL</th>
+                    <th>Note</th>
+                </tr>
+                <tr ng-repeat="links in person.links">
+                    <td>{{links.url}}</td>
+                    <td>{{links.note}}</td>
+                </tr>
+            </table>
+            <!-- Memberships are not created now. First ensure user exist?-->
+
 		</form>
+
 	</div>
 </body>
-<script>
-angular.module('popitPerson', [])
-    .controller("popitPersonController", ['$scope', function($scope){
-	    $scope.master = angular.copy(user)
-	}])
-	
-</script>
+
 </html>
