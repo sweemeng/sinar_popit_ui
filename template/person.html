@@ -85,14 +85,14 @@
                 url: '',
                 note: ''
             };
-        }
+        };
     });
 
 </script>
 </head>
 <body ng-app="popitPerson">
 
-    <!-- TODO: use a proper element to align form
+    <!--
 		 TODO: this should create user first but do not create memberships
 		 TODO: memberships to be added on edit.
          -->
@@ -173,7 +173,7 @@
                 </div>
                 <div class="form-group">
                     <label for="link_note">Note</label>
-                    <input type="text" class="form-control" id="link_note" ng-model="templ_link.note">
+                    <input type="text" class="form-control" id="link_note" ng-model="temp_link.note">
                 </div>
                 <div class="form-group">
                     <button id="submit_links" class="form-control" ng-click="add_url()">Add</button>
