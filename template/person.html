@@ -68,7 +68,6 @@
         };
 
         $scope.add_alternative_name = function(){
-            console.log("bam")
 
             $scope.person.other_names.push($scope.temp_alternative_name);
             $scope.temp_alternative_name = {
@@ -79,12 +78,21 @@
             }
         };
 
+        $scope.remove_alternative_name = function(index){
+            $scope.person.other_names.splice(index, 1);
+        };
+
         $scope.add_url = function(){
             $scope.person.links.push($scope.temp_link);
             $scope.temp_link = {
                 url: '',
                 note: ''
             };
+        };
+
+        $scope.remove_url = function(idx){
+            console.log(idx);
+            $scope.person.links.splice(idx, 1);
         };
     });
 
@@ -124,6 +132,7 @@
                     <button class="form-control" id="submit_alternative_name" ng-click="add_alternative_name()">Add</button>
                 </div>
             </div>
+            <br/>
             <table class="table">
                 <tr>
                     <th>Name</th>
@@ -136,6 +145,7 @@
                     <td>{{alternative_name.start_date}}</td>
                     <td>{{alternative_name.end_date}}</td>
                     <td>{{alternative_name.note}}</td>
+                    <td><button id="remove_altenative_name" class="btn btn-danger" ng-click="remove_alternative_name($index)">Delete</button></td>
                 </tr>
             </table>
             <div class="form-group">
@@ -179,7 +189,7 @@
                     <button id="submit_links" class="form-control" ng-click="add_url()">Add</button>
                 </div>
             </div>
-
+            <br/>
             <table class="table">
                 <tr>
                     <th>URL</th>
@@ -188,6 +198,7 @@
                 <tr ng-repeat="links in person.links">
                     <td>{{links.url}}</td>
                     <td>{{links.note}}</td>
+                    <td><button id="remove_link" class="btn btn-danger" ng-click="remove_url($index)">Delete</button></td>
                 </tr>
             </table>
             <!-- Memberships are not created now. First ensure user exist?-->
