@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <form method="post" action="/addmembers/">
+        <select name="organization">
+            {% for organization in organizations %}
+                <option value="{{ organization['id'] }}">Add membership for {{ organization['name'] }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit"/>
+    </form>
+</body>
+</html>

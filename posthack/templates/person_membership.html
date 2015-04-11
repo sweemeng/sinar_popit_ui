@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+Name: {{ person["name"] }}<br/>
+<form action="{{ person['id']}}" method="post">
+    <select name="membership">
+    {% for membership in person["memberships"] %}
+        <option value="{{membership['url']}}">{{membership["role"]}} at {{membership["start_date"]}} to {{membership["end_date"]}}</option>
+    {% endfor %}
+    </select>
+    <input type="submit" value="DELETE"/>
+
+</form>
+
+
+</body>
+</html>

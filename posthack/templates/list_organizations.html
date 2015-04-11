@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    {% for organization in organizations %}
+    <a href="/addpost/{{ organization['id'] }}">{{organization['name']}}</a><br/>
+    {% endfor %}
+    <br/><br/>
+    {% if prev_url %}
+        <a href="{{ prev_page }}">prev</a>
+    {% endif %}
+    {% if has_more %}
+        <a href="{{next_page}}">next</a>
+    {% endif %}
+</body>
+</html>

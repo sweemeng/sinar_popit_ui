@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+{% for post in posts %}
+<a href="{{ url }}/{{ post['id'] }}">{{post['label']}}</a><br/>
+{% endfor %}
+<br/>
+<br/>
+{% if prev_url %}
+<a href="{{ prev_url }}">prev</a>
+{% endif %}
+
+{% if has_more %}
+    {% if next_url %}
+    <a href="{{ next_url }}">next</a>
+    {% endif %}
+{% endif %}
+
+</body>
+</html>
