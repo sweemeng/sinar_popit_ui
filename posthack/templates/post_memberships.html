@@ -32,7 +32,7 @@
                     return false;
                 }
             })
-            .autocomplete("instance")._renderItem = function(ul, item){
+            .data("uiAutocomplete")._renderItem = function(ul, item){
                 return $("<li>")
                         .append("<a>"+item.name+"</a>")
                         .appendTo(ul);
@@ -63,15 +63,16 @@
                     $("#post_name").val(ui.item.label);
                     $("#post_id").val(ui.item.id);
                     return false;
+                },
+                _renderItem : function(ul, item){
+                    console.log("bam");
+                    console.log(item.label);
+                    return $("<li>")
+                            .append("<a>"+item.label+"</a>")
+                            .appendTo(ul);
                 }
-            })
-            .autocomplete("instance")._renderItem = function(ul, item){
-                console.log("bam");
-                console.log(item.label);
-                return $("<li>")
-                        .append("<a>"+item.label+"</a>")
-                        .appendTo(ul);
-            };
+
+            });
         });
     </script>
 </head>
