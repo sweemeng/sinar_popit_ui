@@ -8,6 +8,9 @@
 <form method="post" action="/addmembers/{{ organizations_id }}">
     <label for="name">Name</label><input type="text" name="name" id="name"/><br/>
     <label for="role">Role</label><input type="text" name="role" id="role"/><br/>
+    <label for="person_id">Person ID</label><input type="text" id="person_id" name="person_id"/>
+    <label for="post_id">post ID</label><input type="text" id="post_id" name="person_id">
+    <!--
     <label for="person_id">Person</label><select id="person_id" name="person_id">
         {% for person in persons %}
         <option value="{{ person['id'] }}">{{ person["name"] }}</option>
@@ -18,7 +21,7 @@
         <option value="{{ post['id'] }}">{{ post["label"] }}</option>
         {% endfor %}
     </select><br/>
-
+    -->
 
     <label for="start_date">Start date</label><input type="text" id="start_date" name="start_date"/><br/>
     <label for="end_date">End Date</label><input type="text" id="end_date" name="end_date"/><br/>
