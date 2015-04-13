@@ -3,6 +3,10 @@ from flask import Flask
 from flask import render_template
 from flask import request
 from flask import redirect
+from flask import jsonify
+from flask import make_response
+from flask import Response
+import json
 import requests
 
 """
@@ -40,6 +44,19 @@ def add_post(organization_id):
 
     return render_template("addpost.html", organization_id=organization_id)
 
+@app.route("/search/<entity>")
+def search(entity):
+    key = "name"
+    name = request.args.get("name")
+
+    if not name:
+        key = "label"
+        name = request.args.get("label")
+    if not name:
+        return Response(json.dumps([]), mimetype="application/json")
+    value = search_entity(entity, key, name)
+    print value
+    return Response(json.dumps(value), mimetype="application/json")
 
 @app.route("/listorgs/")
 def list_organizations():
@@ -81,12 +98,8 @@ def create_membership(organizations_id):
         if request.form["end_date"]:
             data["end_date"]  = request.form["end_date"]
         return "Done"
-    persons = fetch_entity("persons")
 
-    posts = get_entity("posts", "organization_id", organizations_id)
     return render_template("post_memberships.html",
-                           persons=persons,
-                           posts=posts,
                            organizations_id=organizations_id)
 
 @app.route("/addmembers/", methods=["GET", "POST"])
