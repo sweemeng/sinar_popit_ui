@@ -88,7 +88,6 @@ def list_organizations():
 def create_membership(organizations_id):
     if request.method == "POST":
         data = {
-            "label": request.form["name"],
             "role": request.form["role"],
             "person_id": request.form["person_id"],
             "post_id": request.form["post_id"],
@@ -97,7 +96,12 @@ def create_membership(organizations_id):
         }
         if request.form["end_date"]:
             data["end_date"]  = request.form["end_date"]
-        return "Done"
+        url = "%s/%s/" % (POPIT_ENDPOINT, "memberships")
+        r = requests.post(url, headers=headers, data=data)
+        if r.status_code != 200:
+            return r.content
+
+        return r.content
 
     return render_template("post_memberships.html",
                            organizations_id=organizations_id)
