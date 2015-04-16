@@ -3,21 +3,84 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title></title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script>
+        $(function(){
+            $("#source").autocomplete({
+                source: function(request, response){
+                    $.ajax({
+                        url: "/search/persons",
+                        data: {
+                            name: request.term
+                        },
+                        success: function(data){
+                            response( data);
+                        }
+                    });
+                },
+                focus: function(event, ui){
+                    $("#source").val(ui.item.name);
+                    return false;
+                },
+                select: function(event, ui){
+                    console.log("boom");
+                    console.log(ui.item.name);
+                    $("#source").val(ui.item.name);
+                    $("#source_id").val(ui.item.id);
+                    return false;
+                }
+            })
+            .data("uiAutocomplete")._renderItem = function(ul, item){
+                return $("<li>")
+                        .append("<a>"+item.name+"</a>")
+                        .appendTo(ul);
+            };
+
+            $("#target").autocomplete({
+                source: function(request, response){
+                    $.ajax({
+                        url: "/search/persons",
+                        data: {
+                            name: request.term
+                        },
+                        success: function(data){
+                            console.log("loaded");
+                            console.log(data[0].name);
+                            response( data);
+                        }
+                    });
+                },
+                focus: function(event, ui){
+                    console.log("focusing");
+                    $("#target").val(ui.item.name);
+                    return false;
+                },
+                select: function(event, ui){
+                    console.log("boom");
+                    console.log(ui.item.name);
+                    $("#target").val(ui.item.name);
+                    $("#target_id").val(ui.item.id);
+                    return false;
+                }
+
+            })
+            .data("uiAutocomplete")._renderItem = function(ul, item){
+                return $("<li>")
+                        .append("<a>"+item.name+"</a>")
+                        .appendTo(ul);
+            }
+        });
+    </script>
 </head>
 <body>
     <b>Do not merge with wrong people!</b><br/>
     Merge data from <form method="post" action="/mergeperson/">
-        <select name="secondary_person">
-            {% for person in persons %}
-                <option value="{{person['id']}}">{{person['name']}}</option>
-            {% endfor %}
-        </select>
-        into
-        <select name="primary_person">
-            {% for person in persons %}
-                <option value="{{person['id']}}">{{person['name']}}</option>
-            {% endfor %}
-        </select>
+        <input type="text" id="source" name="source"/>
+        <input type="hidden" id="source_id" name="source_id"/> to
+        <input type="text" id="target" name="target">
+        <input type="hidden" id="target_id" name="target_id"/>
         <input type="submit" value="merge"/>
     </form>
 </body>

@@ -118,16 +118,36 @@ def go_to_membership():
 @app.route("/mergeperson/", methods=["GET", "POST"])
 def merge_person():
     if request.method == "POST":
-        primary_person = request.form["primary_person"]
-        secondary_person = request.form["secondary_person"]
+        primary_person = request.form["target_id"]
+        secondary_person = request.form["source_id"]
+        person_one = fetch_one_entity("persons", primary_person)
+        person_two = fetch_one_entity("persons", secondary_person)
+
+        for membership in person_two["memberships"]:
+            data = {}
+
+            data["role"] = membership["role"]
+            data["person_id"] = primary_person
+            data["organization_id"] = membership["organization_id"]
+            data["post_id"] = membership["post_id"]
+            data["start_date"] = membership["start_date"]
+            if "end_data" in membership:
+                data["end_date"] = membership["end_date"]
+            url = "%s/%s" % (POPIT_ENDPOINT, "memberships")
+            r = requests.post(url, headers=headers, data=data)
+            if r.status_code != 200:
+                print r.content
+
+
         merge_url = "%s/persons/%s/merge/%s" % (POPIT_ENDPOINT, primary_person, secondary_person)
-        print merge_url
+        #print merge_url
         r =  requests.post(merge_url, headers=headers)
         if r.status_code == 200:
             return "ok"
         return str((r.status_code, r.content, r.reason))
-    persons = fetch_entity("persons")
-    return render_template("mergeperson.html", persons=persons)
+        #return "OK"
+
+    return render_template("mergeperson.html")
 
 @app.route("/selectperson/", methods=["GET", "POST"])
 def select_person_merge():
