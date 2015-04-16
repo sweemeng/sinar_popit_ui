@@ -38,7 +38,7 @@ def add_post(organization_id):
 
         url = "%s/%s" % (POPIT_ENDPOINT, "posts")
 
-        r = requests.post(url, data=data, headers=headers)
+        r = requests.post(url, data=data, headers=headers,verify=False)
 
         return str((r.status_code, r.content))
 
@@ -65,7 +65,7 @@ def list_organizations():
         params["page"] = request.args.get("page")
 
     url =  "%s/%s" % (POPIT_ENDPOINT, "organizations")
-    r = requests.get(url, params=params)
+    r = requests.get(url, params=params, verify=False)
     data = r.json()
     page =  data["page"]
     url = "/create/"
@@ -97,7 +97,7 @@ def create_membership(organizations_id):
         if request.form["end_date"]:
             data["end_date"]  = request.form["end_date"]
         url = "%s/%s/" % (POPIT_ENDPOINT, "memberships")
-        r = requests.post(url, headers=headers, data=data)
+        r = requests.post(url, headers=headers, data=data, verify=False)
         if r.status_code != 200:
             return r.content
 
@@ -134,14 +134,14 @@ def merge_person():
             if "end_data" in membership:
                 data["end_date"] = membership["end_date"]
             url = "%s/%s" % (POPIT_ENDPOINT, "memberships")
-            r = requests.post(url, headers=headers, data=data)
+            r = requests.post(url, headers=headers, data=data, verify=False)
             if r.status_code != 200:
                 print r.content
 
 
         merge_url = "%s/persons/%s/merge/%s" % (POPIT_ENDPOINT, primary_person, secondary_person)
-        #print merge_url
-        r =  requests.post(merge_url, headers=headers)
+        print merge_url
+        r =  requests.post(merge_url, headers=headers, verify=False)
         if r.status_code == 200:
             return "ok"
         return str((r.status_code, r.content, r.reason))
@@ -156,7 +156,7 @@ def select_person_merge():
         params["page"] = request.method.get("page")
 
     url = "%s/%s" % (POPIT_ENDPOINT, "persons")
-    r = requests.get(url, params=params)
+    r = requests.get(url, params=params, verify=False)
     data = r.json()
     persons =  data["result"]
     return data["result"]
@@ -164,7 +164,7 @@ def select_person_merge():
 @app.route("/deletemembership/<person_id>", methods=["POST", "GET"])
 def delete_post(person_id):
     if request.method == "POST":
-        requests.delete(request.form["membership"])
+        requests.delete(request.form["membership"], verify=False)
         return "Done"
 
     person = fetch_one_entity("persons", person_id)
@@ -173,7 +173,7 @@ def delete_post(person_id):
 @app.route("/deletepostmembership/<post_id>", methods=["POST", "GET"])
 def delete_post_membership(post_id):
     if request.method ==  "POST":
-        requests.delete(request.form["membership"])
+        requests.delete(request.form["membership"], verify=False)
         print request.form["membership"]
         return "Done"
     post = fetch_one_entity("posts", post_id)
@@ -195,7 +195,7 @@ def list_post():
     if request.args.get("page"):
         params["page"] = request.args.get("page")
     post_url = "%s/%s" % (POPIT_ENDPOINT, "posts")
-    r = requests.get(post_url, params=params)
+    r = requests.get(post_url, params=params, verify=False)
 
     data = r.json()
     page = data["page"]
@@ -222,7 +222,7 @@ def list_person():
     if request.args.get("page"):
         params["page"] = request.args.get("page")
     person_url = "%s/%s" % (POPIT_ENDPOINT, "persons")
-    r = requests.get(person_url, params=params)
+    r = requests.get(person_url, params=params, verify=False)
     data = r.json()
     persons = data["result"]
     page =  data["total"] / data["per_page"]
@@ -235,7 +235,7 @@ def list_person():
 
 def fetch_one_entity(entity_type, entity_id):
     url = "%s/%s/%s" % (POPIT_ENDPOINT, entity_type, entity_id)
-    r = requests.get(url)
+    r = requests.get(url, verify=False)
     if r.status_code == 200:
         data = r.json()
         return data["result"]
@@ -244,7 +244,7 @@ def fetch_one_entity(entity_type, entity_id):
 
 def fetch_entity(entity_type):
     url = "%s/%s" % (POPIT_ENDPOINT, entity_type)
-    r = requests.get(url, headers=headers)
+    r = requests.get(url, headers=headers, verify=False)
 
     if r.status_code == 200:
         data = r.json()
@@ -253,7 +253,7 @@ def fetch_entity(entity_type):
 
 def search_entity(entity, key, value):
     url = "%s/search/%s?q=%s:%s" % (POPIT_ENDPOINT, entity, key, value)
-    r = requests.get(url, headers=headers)
+    r = requests.get(url, headers=headers, verify=False)
     if r.status_code == 200:
         data = r.json()
         return data["result"]
@@ -261,7 +261,7 @@ def search_entity(entity, key, value):
 
 def get_entity(entity, key, value):
     url = "%s/%s" % (POPIT_ENDPOINT, entity)
-    r = requests.get(url)
+    r = requests.get(url, verify=False)
     data = r.json()
     result_list = []
     for entry in data["result"]:
@@ -271,4 +271,4 @@ def get_entity(entity, key, value):
     return result_list
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True)
