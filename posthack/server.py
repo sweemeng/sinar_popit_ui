@@ -19,6 +19,9 @@ POPIT_ENDPOINT = "https://sinar-malaysia.popit.mysociety.org/api/v0.1"
 API_KEY = "06b50c66ad47e99728b2b527de9db0429668da12"
 headers = {"Apikey":API_KEY}
 
+cache = {}
+
+
 @app.route("/")
 def glue():
     return render_template("glue.html")
@@ -39,6 +42,14 @@ def add_post(organization_id):
         url = "%s/%s" % (POPIT_ENDPOINT, "posts")
 
         r = requests.post(url, data=data, headers=headers,verify=False)
+
+        del_list = []
+        for key in cache:
+            if url in key:
+                del_list.append(key)
+
+        for key in del_list:
+            del cache[key]
 
         return str((r.status_code, r.content))
 
@@ -65,7 +76,13 @@ def list_organizations():
         params["page"] = request.args.get("page")
 
     url =  "%s/%s" % (POPIT_ENDPOINT, "organizations")
-    r = requests.get(url, params=params, verify=False)
+    cache_key = str((url, params))
+    if cache_key in cache:
+        r = cache[cache_key]
+    else:
+        r = requests.get(url, params=params, verify=False)
+        cache[cache_key] = r
+
     data = r.json()
     page =  data["page"]
     url = "/create/"
@@ -144,6 +161,15 @@ def merge_person():
         r =  requests.post(merge_url, headers=headers, verify=False)
         if r.status_code == 200:
             return "ok"
+        person_url = "%s/%s" % (POPIT_ENDPOINT, "persons")
+        if person_url in cache:
+            del cache[person_url]
+        first_person_url = "%s/%s" % (person_url, primary_person)
+        if first_person_url in cache:
+            del cache[first_person_url]
+        second_person_url = "%s/%s" % (person_url, secondary_person)
+        if second_person_url in cache:
+            del cache[second_person_url]
         return str((r.status_code, r.content, r.reason))
         #return "OK"
 
@@ -156,7 +182,12 @@ def select_person_merge():
         params["page"] = request.method.get("page")
 
     url = "%s/%s" % (POPIT_ENDPOINT, "persons")
-    r = requests.get(url, params=params, verify=False)
+    cache_key = str((url, params))
+    if cache_key in cache:
+        r = cache[cache_key]
+    else:
+        r = requests.get(url, params=params, verify=False)
+        cache[cache_key] = r
     data = r.json()
     persons =  data["result"]
     return data["result"]
@@ -195,7 +226,12 @@ def list_post():
     if request.args.get("page"):
         params["page"] = request.args.get("page")
     post_url = "%s/%s" % (POPIT_ENDPOINT, "posts")
-    r = requests.get(post_url, params=params, verify=False)
+    cache_key = str((post_url, params))
+    if cache_key in cache:
+        r = cache[cache_key]
+    else:
+        r = requests.get(post_url, params=params, verify=False)
+        cache[cache_key] = r
 
     data = r.json()
     page = data["page"]
@@ -222,7 +258,12 @@ def list_person():
     if request.args.get("page"):
         params["page"] = request.args.get("page")
     person_url = "%s/%s" % (POPIT_ENDPOINT, "persons")
-    r = requests.get(person_url, params=params, verify=False)
+    cache_key = str((person_url, params))
+    if cache_key in cache:
+        r = cache[cache_key]
+    else:
+        r = requests.get(person_url, params=params, verify=False)
+        cache[cache_key] = r
     data = r.json()
     persons = data["result"]
     page =  data["total"] / data["per_page"]
@@ -235,7 +276,11 @@ def list_person():
 
 def fetch_one_entity(entity_type, entity_id):
     url = "%s/%s/%s" % (POPIT_ENDPOINT, entity_type, entity_id)
-    r = requests.get(url, verify=False)
+    if url in cache:
+        r = cache[url]
+    else:
+        r = requests.get(url, verify=False)
+        cache[url] = r
     if r.status_code == 200:
         data = r.json()
         return data["result"]
@@ -244,13 +289,18 @@ def fetch_one_entity(entity_type, entity_id):
 
 def fetch_entity(entity_type):
     url = "%s/%s" % (POPIT_ENDPOINT, entity_type)
-    r = requests.get(url, headers=headers, verify=False)
+    if url in cache:
+        r = cache[url]
+    else:
+        r = requests.get(url, headers=headers, verify=False)
+        cache[url] = r
 
     if r.status_code == 200:
         data = r.json()
         return data["result"]
     return []
 
+# This is only used in merging user, don't cache as the result will change
 def search_entity(entity, key, value):
     url = "%s/search/%s?q=%s:%s" % (POPIT_ENDPOINT, entity, key, value)
     r = requests.get(url, headers=headers, verify=False)
@@ -261,7 +311,11 @@ def search_entity(entity, key, value):
 
 def get_entity(entity, key, value):
     url = "%s/%s" % (POPIT_ENDPOINT, entity)
-    r = requests.get(url, verify=False)
+    if url in cache:
+        r = cache[url]
+    else:
+        r = requests.get(url, verify=False)
+        cache[url] = r
     data = r.json()
     result_list = []
     for entry in data["result"]:
