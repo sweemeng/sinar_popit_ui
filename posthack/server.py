@@ -142,14 +142,19 @@ def merge_person():
 
         for membership in person_two["memberships"]:
             data = {}
-
-            data["role"] = membership["role"]
-            data["person_id"] = primary_person
-            data["organization_id"] = membership["organization_id"]
-            data["post_id"] = membership["post_id"]
-            data["start_date"] = membership["start_date"]
-            if "end_data" in membership:
-                data["end_date"] = membership["end_date"]
+            try:
+                data["role"] = membership["role"]
+                data["person_id"] = primary_person
+                data["organization_id"] = membership["organization_id"]
+                if "post_id" in membership:
+                    data["post_id"] = membership["post_id"]
+                data["start_date"] = membership["start_date"]
+                if "end_data" in membership:
+                    data["end_date"] = membership["end_date"]
+            except Exception as e:
+                print "attempting to merge: ", membership
+                print e.message
+                return "fail merging membershi\n %s" % str(membership)
             url = "%s/%s" % (POPIT_ENDPOINT, "memberships")
             r = requests.post(url, headers=headers, data=data, verify=False)
             if r.status_code != 200:
