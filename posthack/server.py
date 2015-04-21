@@ -204,8 +204,11 @@ def delete_post(person_id):
 @app.route("/deletepostmembership/<post_id>", methods=["POST", "GET"])
 def delete_post_membership(post_id):
     if request.method ==  "POST":
-        requests.delete(request.form["membership"], verify=False)
+        requests.delete(request.form["membership"], verify=False, headers=headers)
         print request.form["membership"]
+        post_url = "%s/%s/%s" % (POPIT_ENDPOINT, "posts", post_id)
+        if post_url in cache:
+            del cache[post_url]
         return "Done"
     post = fetch_one_entity("posts", post_id)
     memberships = {}
