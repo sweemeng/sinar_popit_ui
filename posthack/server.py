@@ -69,6 +69,24 @@ def search(entity):
     print value
     return Response(json.dumps(value), mimetype="application/json")
 
+@app.route("/addpost/")
+def search_add_post():
+    name = request.args.get("name")
+    if not name:
+        return render_template("search_result.html")
+    action = "/addpost"
+    results = search_entity("organizations", "name", name)
+    return render_template("search_result.html", results=results, entity="organizations", action=action)
+
+@app.route("/deletepostmembership")
+def search_del_membership():
+    name = request.args.get("name")
+    if not name:
+        return render_template("search_result.html")
+    action = "/deletepostmembership"
+    results = search_entity("posts", "label", name)
+    return render_template("search_result.html", results=results, action=action)
+
 @app.route("/listorgs/")
 def list_organizations():
     params = {}
@@ -259,6 +277,8 @@ def list_post():
                            prev_url=prev_url,
                            next_url=next_url,
                            has_more=has_more)
+
+
 
 @app.route("/listperson/delete/")
 def list_person():

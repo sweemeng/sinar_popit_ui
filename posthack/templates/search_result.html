@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <form action="" method="get">
+        <label for="name">Name to search: </label>
+        <input type="text" id="name" name="name"/>
+    </form>
+    {% for result in results %}
+        {% if result["name"] %}
+            <a href="{{action}}/{{result['id']}}">{{result["name"]}}</a><br/>
+        {% else %}
+            <a href="{{action}}/{{result['id']}}">{{result["label"]}}</a><br/>
+        {% endif %}
+    {% endfor %}
+</body>
+</html>
