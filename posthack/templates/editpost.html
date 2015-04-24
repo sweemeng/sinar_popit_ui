@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<form method="post" action="/editpost/{{post['id']}}">
+    <label for="name">Name</label><input id="name" type="text" name="name" value="{{post['label']}}"/><br/>
+    <label for="role">Role</label><input id="role" type="text" name="role" value="{{post['role']}}"/><br/>
+
+    <label for="start_date">Start Date</label><input id="start_date" type="text" name="start_date"
+                                                     value="{{post['start_date']}}"/><br/>
+    <label for="end_date">End Date</label><input id="end_date" type="text" name="end_date"
+        value="{{post['end_date']}}"/><br/>
+    <input type="submit" value="create"/>
+</form>
+</body>
+</html>

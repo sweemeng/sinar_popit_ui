@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script>
+        $(function(){
+            $("#person_name").autocomplete({
+                source: function(request, response){
+                    $.ajax({
+                        url: "/search/persons",
+                        data: {
+                            name: request.term
+                        },
+                        success: function(data){
+                            response( data);
+                        }
+                    });
+                },
+                focus: function(event, ui){
+                    $("#person_name").val(ui.item.name);
+                    return false;
+                },
+                select: function(event, ui){
+                    console.log("boom");
+                    console.log(ui.item.name);
+                    $("#person_name").val(ui.item.name);
+                    $("#person_id").val(ui.item.id);
+                    return false;
+                }
+            })
+            .data("uiAutocomplete")._renderItem = function(ul, item){
+                return $("<li>")
+                        .append("<a>"+item.name+"</a>")
+                        .appendTo(ul);
+            };
+
+            $("#post_name").autocomplete({
+                source: function(request, response){
+                    $.ajax({
+                        url: "/search/posts",
+                        data: {
+                            label: request.term
+                        },
+                        success: function(data){
+                            console.log("loaded");
+                            console.log(data[0].label);
+                            response( data);
+                        }
+                    });
+                },
+                focus: function(event, ui){
+                    console.log("focusing");
+                    $("#post_name").val(ui.item.label);
+                    return false;
+                },
+                select: function(event, ui){
+                    console.log("boom");
+                    console.log(ui.item.label);
+                    $("#post_name").val(ui.item.label);
+                    $("#post_id").val(ui.item.id);
+                    return false;
+                },
+                _renderItem : function(ul, item){
+                    console.log("bam");
+                    console.log(item.label);
+                    return $("<li>")
+                            .append("<a>"+item.label+"</a>")
+                            .appendTo(ul);
+                }
+
+            });
+        });
+    </script>
+</head>
+<body>
+<form method="post" action="/editmembership/{{ membership_id }}">
+    <label for="role">Role</label><input type="text" name="role" id="role" value="{{membership['role']}}"/><br/>
+    <label for="person_name">Person Name</label><input type="text" id="person_name" name="person_name" value="{{person['name']}}"/><br/>
+    <input type="hidden" id="person_id" name="person_id" value="{{membership['person_id']}}"/>
+    <label for="post_name">post Name</label><input type="text" id="post_name" name="post_name" value="{{post['label']}}"><br/>
+    <input type="hidden" id="post_id" name="post_id" value="{{membership['post_id']}}">
+
+    <label for="start_date">Start date</label><input type="text" id="start_date" name="start_date" value="{{membership['start_date']}}"/><br/>
+    <label for="end_date">End Date</label><input type="text" id="end_date" name="end_date" value="{{membership['end_date']}}"/><br/>
+    <input type="submit"/>
+</form>
+</body>
+</html>

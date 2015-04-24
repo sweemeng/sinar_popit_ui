@@ -50,10 +50,52 @@ def add_post(organization_id):
 
         for key in del_list:
             del cache[key]
-
-        return str((r.status_code, r.content))
+        if r.status_code != 200:
+            return str((r.status_code, r.content))
+        return "OK"
 
     return render_template("addpost.html", organization_id=organization_id)
+
+@app.route("/editmembership/<membership_id>", methods=["GET", "POST"])
+def edit_membership(membership_id):
+    if request.method == "POST":
+
+        data = {}
+        membership = fetch_one_entity("memberships", membership_id)
+        # TODO: fix ways to add area
+        for key in membership:
+            if key == "area_id":
+                area = {}
+                area["id"] = request.form['area_id']
+                area["name"] = request.form["area_name"]
+                area["state"] = request.form["state"]
+                data["area"] = area
+
+
+            elif key not in request.form:
+                # Don't care about field not in form
+                continue
+
+            elif request.form[key] == membership[key]:
+                # don't bother updating same value
+                continue
+            else:
+                data[key] = request.form[key]
+
+        if not data:
+            return "No changes"
+        url = "%s/%s/%s" % (POPIT_ENDPOINT, "memberships", membership_id)
+        r = requests.put("", data=data, headers=headers)
+
+        return str(data)
+
+    membership = fetch_one_entity("memberships", membership_id)
+
+    person = fetch_one_entity("persons", membership["person_id"])
+    post = fetch_one_entity("posts", membership["post_id"])
+    return render_template("edit_memberships.html", membership=membership, person=person, post=post,
+                           membership_id=membership_id)
+
 
 @app.route("/search/<entity>")
 def search(entity):
@@ -237,6 +279,13 @@ def delete_post_membership(post_id):
     memberships = {}
     for membership in post["memberships"]:
         person = fetch_one_entity("persons", membership["person_id"])
+        organization = fetch_one_entity("organizations", membership["organization_id"])
+        # TODO: Handle removal from list,
+        if not person:
+            continue
+        if not organization:
+            continue
+
         print "processing name"
         membership["person_name"] =  person["name"]
         organization = fetch_one_entity("organizations", membership["organization_id"])
