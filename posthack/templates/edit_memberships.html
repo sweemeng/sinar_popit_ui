@@ -83,7 +83,13 @@
     <input type="hidden" id="person_id" name="person_id" value="{{membership['person_id']}}"/>
     <label for="post_name">post Name</label><input type="text" id="post_name" name="post_name" value="{{post['label']}}"><br/>
     <input type="hidden" id="post_id" name="post_id" value="{{membership['post_id']}}">
-
+    <!-- add value for area -->
+    <label for="area_id">Area Id</label><input id="area_id" type="text" name="area_id"
+                                               value="{{ membership['area']['id'] }}"><br/>
+    <label for="area_name">Area Name</label><input id="area_name" type="text" name="area_name"
+        value="{{ membership['area']['name']}}"><br/>
+    <label for="area_state">Area State</label><input id="area_state" type="text" name="area_state"
+        value="{{ membership['area']['state']}}"><br/>
     <label for="start_date">Start date</label><input type="text" id="start_date" name="start_date" value="{{membership['start_date']}}"/><br/>
     <label for="end_date">End Date</label><input type="text" id="end_date" name="end_date" value="{{membership['end_date']}}"/><br/>
     <input type="submit"/>

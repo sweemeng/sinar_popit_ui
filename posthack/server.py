@@ -39,6 +39,14 @@ def add_post(organization_id):
             data["end_date"] = request.form["end_date"]
         data["organization_id"] = organization_id
 
+        area = {}
+        if request.form.get("area_id"):
+            area["id"] = request.form["area_id"]
+            area["name"] = request.form["area_name"]
+            area["state"] = request.form["area_state"]
+        if area:
+            data["area"] = area
+
         url = "%s/%s" % (POPIT_ENDPOINT, "posts")
 
         r = requests.post(url, data=data, headers=headers,verify=False)
@@ -68,7 +76,7 @@ def edit_membership(membership_id):
                 area = {}
                 area["id"] = request.form['area_id']
                 area["name"] = request.form["area_name"]
-                area["state"] = request.form["state"]
+                area["state"] = request.form["area_state"]
                 data["area"] = area
 
 
@@ -173,6 +181,15 @@ def create_membership(organizations_id):
         }
         if request.form["end_date"]:
             data["end_date"]  = request.form["end_date"]
+
+        area = {}
+        if request.form["area_id"]:
+            area["id"] = request.form["area_id"]
+            area["state"] = request.form["area_state"]
+            area["name"] = request.form["area_name"]
+
+        if area:
+            data["area"] =  area
         url = "%s/%s/" % (POPIT_ENDPOINT, "memberships")
         r = requests.post(url, headers=headers, data=data, verify=False)
         if r.status_code != 200:
