@@ -17,7 +17,7 @@ app = Flask(__name__)
 POPIT_ENDPOINT = "https://sinar-malaysia.popit.mysociety.org/api/v0.1"
 #POPIT_ENDPOINT = "http://localhost:3000/api"
 API_KEY = "06b50c66ad47e99728b2b527de9db0429668da12"
-headers = {"Apikey":API_KEY}
+headers = {"Apikey":API_KEY, "Content-Type": "application/json"}
 
 cache = {}
 
@@ -49,7 +49,7 @@ def add_post(organization_id):
 
         url = "%s/%s" % (POPIT_ENDPOINT, "posts")
 
-        r = requests.post(url, data=data, headers=headers,verify=False)
+        r = requests.post(url, data=json.dumps(data), headers=headers,verify=False)
 
         del_list = []
         for key in cache:
@@ -64,6 +64,7 @@ def add_post(organization_id):
 
     return render_template("addpost.html", organization_id=organization_id)
 
+# TODO: make delete part of this form
 @app.route("/editmembership/<membership_id>", methods=["GET", "POST"])
 def edit_membership(membership_id):
     if request.method == "POST":
@@ -71,14 +72,29 @@ def edit_membership(membership_id):
         data = {}
         membership = fetch_one_entity("memberships", membership_id)
         # TODO: fix ways to add area
+        if "delete" in request.form:
+            url = "%s/%s/%s" % (POPIT_ENDPOINT, "memberships", membership_id)
+            r = requests.delete(url, headers=headers)
+            return "deleted"
         for key in membership:
-            if key == "area_id":
+            if key == "area":
                 area = {}
-                area["id"] = request.form['area_id']
-                area["name"] = request.form["area_name"]
-                area["state"] = request.form["area_state"]
-                data["area"] = area
+                original_area = membership[key]
+                if not original_area:
+                    if request.form["area_id"]:
+                        area["id"] = request.form['area_id']
+                        area["name"] = request.form["area_name"]
+                        area["state"] = request.form["area_state"]
+                else:
+                    if original_area["id"] != request.form["area_id"] or \
+                        original_area.get("name") != request.form["area_name"] or \
+                        original_area.get("state") != request.form["area_state"]:
+                        area["id"] = request.form["area_id"]
+                        area["name"] = request.form["area_name"]
+                        area["state"] = request.form["area_state"]
 
+                if area:
+                    data["area"] = area
 
             elif key not in request.form:
                 # Don't care about field not in form
@@ -93,8 +109,16 @@ def edit_membership(membership_id):
         if not data:
             return "No changes"
         url = "%s/%s/%s" % (POPIT_ENDPOINT, "memberships", membership_id)
-        r = requests.put("", data=data, headers=headers)
+        del cache[url]
+        key = "%s/%s" % (POPIT_ENDPOINT, "posts")
+        del cache[key]
+        header = headers
+        header["Content-Type"] = "application/json"
+        
+        r = requests.put(url, data=json.dumps(data), headers=header)
 
+        if r.status_code == 200:
+            return "OK"
         return str(data)
 
     membership = fetch_one_entity("memberships", membership_id)
@@ -133,9 +157,34 @@ def search_del_membership():
     name = request.args.get("name")
     if not name:
         return render_template("search_result.html")
+
+    action = "/deletepostmembership"
     action = "/deletepostmembership"
     results = search_entity("posts", "label", name)
     return render_template("search_result.html", results=results, action=action)
+
+@app.route("/editpostmembership")
+def search_edit_membership():
+    name = request.args.get("name")
+    if not name:
+        return render_template("search_result.html")
+
+    action = "/listpostmembership"
+    results = search_entity("posts", "label", name)
+    return render_template("search_result.html", results=results, action=action)
+
+@app.route("/listpostmembership/<post_id>")
+def list_post_membership(post_id):
+    posts = fetch_one_entity("posts",post_id)
+    memberships = posts["memberships"]
+    action =  "/editmembership"
+    for membership in memberships:
+        person = fetch_one_entity("persons", membership["person_id"])
+        membership["person_name"] = person["name"]
+        organization = fetch_one_entity("organizations", membership["organization_id"])
+        membership["organization_name"] = organization["name"]
+
+    return render_template("list_memberships.html", memberships=memberships, action=action)
 
 @app.route("/listorgs/")
 def list_organizations():
@@ -191,7 +240,7 @@ def create_membership(organizations_id):
         if area:
             data["area"] =  area
         url = "%s/%s/" % (POPIT_ENDPOINT, "memberships")
-        r = requests.post(url, headers=headers, data=data, verify=False)
+        r = requests.post(url, headers=headers, data=json.dumps(data), verify=False)
         if r.status_code != 200:
             return r.content
 
@@ -233,7 +282,7 @@ def merge_person():
                 print e.message
                 return "fail merging membershi\n %s" % str(membership)
             url = "%s/%s" % (POPIT_ENDPOINT, "memberships")
-            r = requests.post(url, headers=headers, data=data, verify=False)
+            r = requests.post(url, headers=headers, data=json.dumps(data), verify=False)
             if r.status_code != 200:
                 print r.content
 
