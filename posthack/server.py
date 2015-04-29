@@ -145,16 +145,19 @@ def search(entity):
 
 @app.route("/addpost/")
 def search_add_post():
+    title = "select post to add membership"
     name = request.args.get("name")
     if not name:
-        return render_template("search_result.html")
+
+        return render_template("search_result.html", title=title)
     action = "/addpost"
     results = search_entity("organizations", "name", name)
-    return render_template("search_result.html", results=results, entity="organizations", action=action)
+    return render_template("search_result.html", results=results, entity="organizations", action=action, title=title)
 
 @app.route("/deletepostmembership")
 def search_del_membership():
     name = request.args.get("name")
+
     if not name:
         return render_template("search_result.html")
 
@@ -166,12 +169,13 @@ def search_del_membership():
 @app.route("/editpostmembership")
 def search_edit_membership():
     name = request.args.get("name")
+    title = "select post to edit membership"
     if not name:
-        return render_template("search_result.html")
+        return render_template("search_result.html", title=title)
 
     action = "/listpostmembership"
     results = search_entity("posts", "label", name)
-    return render_template("search_result.html", results=results, action=action)
+    return render_template("search_result.html", results=results, action=action, title=title)
 
 @app.route("/listpostmembership/<post_id>")
 def list_post_membership(post_id):
