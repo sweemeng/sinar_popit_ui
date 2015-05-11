@@ -249,18 +249,24 @@ def create_membership(organizations_id):
             return r.content
 
         return r.content
-
+    organization = fetch_one_entity("organizations", organizations_id)
+    if not organization:
+        return "No such organization exist"
     return render_template("post_memberships.html",
-                           organizations_id=organizations_id)
+                           organizations_id=organizations_id, organization=organization)
+
 
 @app.route("/addmembers/", methods=["GET", "POST"])
-def go_to_membership():
-    if request.method == "POST":
-        url = "/addmembers/%s" % request.form["organization"]
-        return redirect(url)
-    organizations = fetch_entity("organizations")
-    return render_template("redirect_membership.html",
-                           organizations=organizations)
+def search_add_members():
+    title = "select post to add membership"
+    name = request.args.get("name")
+    if not name:
+
+        return render_template("search_result.html", title=title)
+    action = "/addmembers"
+    results = search_entity("organizations", "name", name)
+    return render_template("search_result.html", results=results, entity="organizations", action=action, title=title)
+
 
 @app.route("/mergeperson/", methods=["GET", "POST"])
 def merge_person():
