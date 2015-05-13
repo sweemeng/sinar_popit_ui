@@ -74,7 +74,7 @@ def edit_membership(membership_id):
         # TODO: fix ways to add area
         if "delete" in request.form:
             url = "%s/%s/%s" % (POPIT_ENDPOINT, "memberships", membership_id)
-            r = requests.delete(url, headers=headers)
+            r = requests.delete(url, headers=headers, verify=False)
             return "deleted"
         for key in membership:
             if key == "area":
@@ -336,7 +336,7 @@ def select_person_merge():
 @app.route("/deletemembership/<person_id>", methods=["POST", "GET"])
 def delete_post(person_id):
     if request.method == "POST":
-        requests.delete(request.form["membership"], verify=False)
+        requests.delete(request.form["membership"], headers=header, verify=False)
         return "Done"
 
     person = fetch_one_entity("persons", person_id)
