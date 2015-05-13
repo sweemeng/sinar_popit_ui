@@ -84,12 +84,18 @@
     <label for="post_name">post Name</label><input type="text" id="post_name" name="post_name" value="{{post['label']}}"><br/>
     <input type="hidden" id="post_id" name="post_id" value="{{membership['post_id']}}">
     <!-- add value for area -->
+    {% if membership['area'] %}
     <label for="area_id">Area Id</label><input id="area_id" type="text" name="area_id"
                                                value="{{ membership['area']['id'] }}"><br/>
     <label for="area_name">Area Name</label><input id="area_name" type="text" name="area_name"
         value="{{ membership['area']['name']}}"><br/>
     <label for="area_state">Area State</label><input id="area_state" type="text" name="area_state"
         value="{{ membership['area']['state']}}"><br/>
+    {% else %}
+   <label for="area_id">Area Id</label><input id="area_id" type="text" name="area_id"><br/>
+    <label for="area_name">Area Name</label><input id="area_name" type="text" name="area_name"><br/>
+    <label for="area_state">Area State</label><input id="area_state" type="text" name="area_state"><br/>
+    {% endif %}
     <label for="start_date">Start date</label><input type="text" id="start_date" name="start_date" value="{{membership['start_date']}}"/><br/>
     <label for="end_date">End Date</label><input type="text" id="end_date" name="end_date" value="{{membership['end_date']}}"/><br/>
     <input type="submit" name="save" value="save"/>

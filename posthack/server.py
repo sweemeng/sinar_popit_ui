@@ -74,7 +74,12 @@ def edit_membership(membership_id):
         # TODO: fix ways to add area
         if "delete" in request.form:
             url = "%s/%s/%s" % (POPIT_ENDPOINT, "memberships", membership_id)
+            del cache[url]
+
+            key = "%s/%s/%s" % (POPIT_ENDPOINT, "posts", request.form["post_id"])
+            del cache[key]
             r = requests.delete(url, headers=headers, verify=False)
+
             return "deleted"
         for key in membership:
             if key == "area":
@@ -114,7 +119,7 @@ def edit_membership(membership_id):
         del cache[key]
         header = headers
         header["Content-Type"] = "application/json"
-        
+
         r = requests.put(url, data=json.dumps(data), headers=header)
 
         if r.status_code == 200:
