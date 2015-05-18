@@ -168,6 +168,7 @@ def search_add_post():
         return render_template("search_result.html", title=title)
     action = "/addpost"
     results = search_entity("organizations", "name", name)
+    print results
     return render_template("search_result.html", results=results, entity="organizations", action=action, title=title)
 
 @app.route("/deletepostmembership")
@@ -248,6 +249,7 @@ def list_organizations():
 @app.route("/addmembers/<organizations_id>", methods=["GET", "POST"])
 def create_membership(organizations_id):
     if request.method == "POST":
+        print "POSTING"
         data = {
             "role": request.form["role"],
             "person_id": request.form["person_id"],
@@ -259,7 +261,7 @@ def create_membership(organizations_id):
             data["end_date"]  = request.form["end_date"]
 
         area = {}
-        if request.form["area_id"]:
+        if request.form.get("area_id"):
             area["id"] = request.form["area_id"]
             area["state"] = request.form["area_state"]
             area["name"] = request.form["area_name"]
@@ -268,10 +270,11 @@ def create_membership(organizations_id):
             data["area"] =  area
         url = "%s/%s/" % (POPIT_ENDPOINT, "memberships")
         r = requests.post(url, headers=headers, data=json.dumps(data), verify=False)
+
         if r.status_code != 200:
             return r.content
 
-        return r.content
+        return "OK"
     organization = fetch_one_entity("organizations", organizations_id)
     if not organization:
         return "No such organization exist"
