@@ -74,10 +74,12 @@ def edit_membership(membership_id):
         # TODO: fix ways to add area
         if "delete" in request.form:
             url = "%s/%s/%s" % (POPIT_ENDPOINT, "memberships", membership_id)
-            del cache[url]
+            if url in cache:
+                del cache[url]
 
             key = "%s/%s/%s" % (POPIT_ENDPOINT, "posts", request.form["post_id"])
-            del cache[key]
+            if key in cache:
+                del cache[key]
             r = requests.delete(url, headers=headers, verify=False)
 
             return "deleted"
@@ -91,7 +93,7 @@ def edit_membership(membership_id):
                         area["name"] = request.form["area_name"]
                         area["state"] = request.form["area_state"]
                 else:
-                    if original_area["id"] != request.form["area_id"] or \
+                    if original_area.get("id") != request.form["area_id"] or \
                         original_area.get("name") != request.form["area_name"] or \
                         original_area.get("state") != request.form["area_state"]:
                         area["id"] = request.form["area_id"]
@@ -108,6 +110,10 @@ def edit_membership(membership_id):
             elif request.form[key] == membership[key]:
                 # don't bother updating same value
                 continue
+            elif not request.form[key]:
+                continue
+            elif request.form[key] == "None":
+                continue
             else:
                 data[key] = request.form[key]
 
@@ -116,11 +122,16 @@ def edit_membership(membership_id):
         url = "%s/%s/%s" % (POPIT_ENDPOINT, "memberships", membership_id)
         del cache[url]
         key = "%s/%s" % (POPIT_ENDPOINT, "posts")
-        del cache[key]
+        if key in cache:
+            del cache[key]
+
+        key = "%s/%s/%s" % (POPIT_ENDPOINT, "posts", request.form["post_id"])
+        if key in cache:
+            del cache[key]
         header = headers
         header["Content-Type"] = "application/json"
 
-        r = requests.put(url, data=json.dumps(data), headers=header)
+        r = requests.put(url, data=json.dumps(data), headers=header, verify=False)
 
         if r.status_code == 200:
             return "OK"
@@ -187,13 +198,20 @@ def list_post_membership(post_id):
     posts = fetch_one_entity("posts",post_id)
     memberships = posts["memberships"]
     action =  "/editmembership"
+    real_membership = []
     for membership in memberships:
+        if not membership["person_id"]:
+            continue
+        if not membership["organization_id"]:
+            continue
+
         person = fetch_one_entity("persons", membership["person_id"])
         membership["person_name"] = person["name"]
         organization = fetch_one_entity("organizations", membership["organization_id"])
         membership["organization_name"] = organization["name"]
+        real_membership.append(membership)
 
-    return render_template("list_memberships.html", memberships=memberships, action=action)
+    return render_template("list_memberships.html", memberships=real_membership, action=action)
 
 @app.route("/listorgs/")
 def list_organizations():
