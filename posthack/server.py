@@ -67,6 +67,7 @@ def add_post(organization_id):
 # TODO: make delete part of this form
 @app.route("/editmembership/<membership_id>", methods=["GET", "POST"])
 def edit_membership(membership_id):
+    global cache
     if request.method == "POST":
 
         data = {}
@@ -133,6 +134,7 @@ def edit_membership(membership_id):
 
         r = requests.put(url, data=json.dumps(data), headers=header, verify=False)
 
+        cache = {}
         if r.status_code == 200:
             return "OK"
         return str(data)
@@ -207,9 +209,17 @@ def list_post_membership(post_id):
             continue
 
         person = fetch_one_entity("persons", membership["person_id"])
-        membership["person_name"] = person["name"]
+        if not person:
+
+            membership["person_name"] = "invalid person"
+        else:
+            membership["person_name"] = person["name"]
         organization = fetch_one_entity("organizations", membership["organization_id"])
-        membership["organization_name"] = organization["name"]
+        if not organization:
+
+            membership["organization_name"] = "Invalid organization"
+        else:
+            membership["organization_name"] = organization["name"]
         real_membership.append(membership)
 
     return render_template("list_memberships.html", memberships=real_membership, action=action)
