@@ -8,6 +8,7 @@ from flask import make_response
 from flask import Response
 import json
 import requests
+import argparse
 
 """
 This is a hack for adding post. This will be replace with a proper frontend
@@ -140,7 +141,8 @@ def edit_membership(membership_id):
         return str(data)
 
     membership = fetch_one_entity("memberships", membership_id)
-
+    if not membership["person_id"]:
+        return "error person_id is null"
     person = fetch_one_entity("persons", membership["person_id"])
     post = fetch_one_entity("posts", membership["post_id"])
     return render_template("edit_memberships.html", membership=membership, person=person, post=post,
@@ -258,6 +260,7 @@ def list_organizations():
 
 @app.route("/addmembers/<organizations_id>", methods=["GET", "POST"])
 def create_membership(organizations_id):
+    global cache
     if request.method == "POST":
         print "POSTING"
         data = {
@@ -283,6 +286,7 @@ def create_membership(organizations_id):
 
         if r.status_code != 200:
             return r.content
+        cache = {}
 
         return "OK"
     organization = fetch_one_entity("organizations", organizations_id)
@@ -390,6 +394,8 @@ def delete_post_membership(post_id):
     post = fetch_one_entity("posts", post_id)
     memberships = {}
     for membership in post["memberships"]:
+        if not membership["person_id"]:
+            continue
         person = fetch_one_entity("persons", membership["person_id"])
         organization = fetch_one_entity("organizations", membership["organization_id"])
         # TODO: Handle removal from list,
@@ -514,4 +520,11 @@ def get_entity(entity, key, value):
     return result_list
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--port", dest="port", metavar="port", type=int, help="port number")
+    args = parser.parse_args()
+    if not args:
+        port = 5000
+    else:
+        port = args.port
+    app.run(host="0.0.0.0", port=port, debug=True)
